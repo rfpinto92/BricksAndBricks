@@ -8,18 +8,19 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private Configurations Configuration;
 
-    public GameObject MainControllerGameObject;
-
-    public Button GoSetPlayerNameButton;
-    public Button GoScoreButton;
-    public Button GoOptionsButton;
-    public Button QuitButton;
-
     // Start is called before the first frame update
     void Start()
     {
+        GameObject MainControllerGameObject = GameObject.Find("MainController");
+
         AudioSource[] AudioMenuClick = MainControllerGameObject.GetComponents<AudioSource>();
         MainController MainController = MainControllerGameObject.GetComponent<MainController>();
+
+        // Find Buttons
+        Button GoSetPlayerNameButton = GameObject.Find("BtnPlay").GetComponent<Button>();
+        Button GoScoreButton = GameObject.Find("BtnScore").GetComponent<Button>();
+        Button GoOptionsButton = GameObject.Find("BtnOptions").GetComponent<Button>();
+        Button QuitButton = GameObject.Find("BtnQuit").GetComponent<Button>();
 
         GoSetPlayerNameButton.onClick.AddListener(() =>
         {

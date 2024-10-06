@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Paddle : MonoBehaviour
 {
     private float Speed = 2.0f;
-    private float MaxMovement = 1.9f;
+    private float MaxMovement = 2.4f;
     private float input = 0f;
 
     [SerializeField]

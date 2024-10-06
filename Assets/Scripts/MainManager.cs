@@ -1,3 +1,5 @@
+using GoogleMobileAds.Api;
+using GooglePlayGames;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -15,10 +17,11 @@ public class MainManager : MonoBehaviour
     public Button BtnRestart;
     public Button BtnReturn;
 
+    private TextMeshProUGUI ScoreText;
+    private TextMeshProUGUI BestScoreText;
 
-    private Text ScoreText;
-    private Text BestScoreText;
-
+    public GameObject RetrysPubCanvas;
+    public GameObject PaddleControls;
     public GameObject GameOverMenu;
 
     private bool m_Started = false;
@@ -34,32 +37,92 @@ public class MainManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+
+    private void OnEnable()
     {
+
+        #region Check Internet Connection
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+            SceneManager.LoadScene("RetryInternetConnection");
+        #endregion
+
         //Audio Objects
         AudioMenuClick = GetComponents<AudioSource>();
         AudioMenuClick[0].Play();
 
+        #region Buttons
 
-        //Buttons
+        #region Start
         GameObject.Find("BtnStart").GetComponent<Button>().onClick.AddListener(() =>
         {
             AudioMenuClick[4].Play();
             m_Start = true;
         });
-        GameObject.Find("BtnReturn").GetComponent<Button>().onClick.AddListener(() => SceneManager.LoadScene("MainMenu"));
+        #endregion
 
-        BtnReturn.onClick.AddListener(() => SceneManager.LoadScene("MainMenu"));
+        #region End Return
+        GameObject.Find("BtnReturn").GetComponent<Button>().onClick.AddListener(() =>
+        {
 
+            Configuration.AppConfig.actualRetry++;
+
+            if (Configuration.AppConfig.actualRetry >= Configuration.AppConfig.MaxRetryToPub)
+            {
+                Configuration.AppConfig.SceneToLoadAfterPub = "MainMenu";
+                Configuration.AppConfig.actualRetry = 0;
+                Instantiate(RetrysPubCanvas);
+            }
+            else
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
+
+        });
+        #endregion
+
+        #region End Restart Button
         BtnRestart.GetComponent<Button>().onClick.AddListener(() =>
         {
             AudioMenuClick[4].Play();
             Configuration.RestartPoints();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        });
 
-        ScoreText = GameObject.Find("ScoreText").GetComponent<Text>();
-        BestScoreText = GameObject.Find("BestScoreText").GetComponent<Text>();
+            Configuration.AppConfig.actualRetry++;
+
+            if (Configuration.AppConfig.actualRetry >= Configuration.AppConfig.MaxRetryToPub)
+            {
+                Configuration.AppConfig.SceneToLoadAfterPub = SceneManager.GetActiveScene().name;
+                Configuration.AppConfig.actualRetry = 0;
+                Instantiate(RetrysPubCanvas);
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+        });
+        #endregion
+
+        #region Top Left Return
+        BtnReturn.onClick.AddListener(() =>
+        {
+            Configuration.AppConfig.actualRetry++;
+
+            if (Configuration.AppConfig.actualRetry >= Configuration.AppConfig.MaxRetryToPub)
+            {
+                Configuration.AppConfig.SceneToLoadAfterPub = "MainMenu";
+                Configuration.AppConfig.actualRetry = 0;
+                Instantiate(RetrysPubCanvas);
+            }
+            else
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
+        });
+        #endregion
+
+        #endregion
+
+        ScoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
+        BestScoreText = GameObject.Find("BestScoreText").GetComponent<TextMeshProUGUI>();
 
         //Set Number Of Lines By the Level
 
@@ -71,10 +134,10 @@ public class MainManager : MonoBehaviour
 
         ScoreText.text = "Level: " + Configuration.ActualLevel.Level + "  Your Score : " + Configuration.ActualLevel.Points;
 
-        LineCount = Configuration.ActualLevel.Level <= 20 ? Configuration.ActualLevel.Level : 20;
+        LineCount = Configuration.ActualLevel.Level <= 21 ? Configuration.ActualLevel.Level : 21;
 
         const float step = 0.6f;
-        int perLine = Mathf.FloorToInt(4.0f / step);
+        int perLine = Mathf.FloorToInt(5.0f / step);
 
         // Get Random PointValue  
         int[] pointCountArray = new[] { 1, 2, 5 };
@@ -84,12 +147,18 @@ public class MainManager : MonoBehaviour
         {
             for (int x = 0; x < perLine; ++x)
             {
-                Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
+                //Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
+
+                Vector3 position = new Vector3(-2.11f + step * x, 2.5f + i * 0.3f, 0);
                 var brick = Instantiate(BrickPrefab, position, Quaternion.identity);
                 brick.PointValue = pointCountArray[randomNumber.Next(0, 3)];
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+    }
+    void Start()
+    {
     }
 
 
@@ -101,7 +170,13 @@ public class MainManager : MonoBehaviour
             {
                 m_Started = true;
 
-                GameObject.Destroy(GameObject.Find("BtnStart")); //destroy start button
+                GameObject.Destroy(GameObject.Find("StartObjects")); //destroy start Object with button and Indicator Text
+
+                Color color = Color.gray;
+                color.a = 0f;
+                GameObject.Find("BtnLeft").GetComponent<Image>().color = color;
+                GameObject.Find("BtnRight").GetComponent<Image>().color = color;
+
 
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
@@ -131,6 +206,7 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+
         //Activate GameOver Buttons
         Destroy(GameObject.Find("ControlBtns"));
         GameOverMenu.SetActive(true);
@@ -157,8 +233,33 @@ public class MainManager : MonoBehaviour
                 GameOverText.text = "YOU ARE NEW NUMBER 1!!";
             }
         }
-
+        DoPostScore(Configuration.ActualLevel.Points);
         playersPontuation.AddPontuation(Configuration.ActualLevel.Points);
         playersPontuation.WritePontuationFile(); //Write File to avoid Player finish app without going to the main menu
     }
+
+    internal void DoPostScore(long Score)
+    {
+
+        Social.ReportScore(
+            Score,
+            GPGSIds.leaderboard_main,
+            (bool success) =>
+            {
+
+                if (!success)
+                {
+                    PlayGamesPlatform.Activate();
+                    Social.Active.localUser.Authenticate((success) =>
+                    {
+                        if (success)
+                            DoPostScore(Score);
+                        else
+                            SceneManager.LoadScene("RetryInternetConnection");
+                    });
+                }
+                else return;
+            });
+    }
+
 }

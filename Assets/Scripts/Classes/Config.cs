@@ -49,8 +49,6 @@ public class Config
     {
         get {  return maxballSpeed; }
     }
-
-
     private float maxpaddleSpeed;
 
     public float maxPaddleSpeed
@@ -58,10 +56,16 @@ public class Config
         get { return maxpaddleSpeed; }
     }
 
+    #region Retry data
+    public int MaxRetryToPub;
+    public int actualRetry;
+    #endregion
 
-
+    public string SceneToLoadAfterPub;
 
     public bool EnableSound;
+
+    public bool IsGoogleLogged;
 
     public string ToJSON()
     {
@@ -77,6 +81,10 @@ public class Config
     {
         GameDificult = GameDificult.Normal;
         EnableSound = true;
+        MaxRetryToPub = 3;
+        actualRetry = 0;
+        SceneToLoadAfterPub = "MainMenu";
+        IsGoogleLogged = false;
     }
 }
 

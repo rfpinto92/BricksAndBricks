@@ -1,3 +1,4 @@
+using GooglePlayGames;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,20 +19,32 @@ public class ScoreTable : MonoBehaviour
     private Configurations Configuration;
 
     public Button GoMenuButton;
+    public GameObject ShowLeaderBoardButton;
+
 
     private void Start()
     {
         mainController = MainControllerGameObject.GetComponent<MainController>();
         AudioSource[] AudioMenuClick = MainControllerGameObject.GetComponents<AudioSource>();
 
+        #region Show Online LeaderBoard Button
+        ShowLeaderBoardButton.SetActive(Configuration.AppConfig.IsGoogleLogged);
+        ShowLeaderBoardButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            PlayGamesPlatform.Activate();
+            Social.Active.localUser.Authenticate(ShowLeaderboardUI);
+        });
+        #endregion
+
+        #region Go Main Maenu Button
         GoMenuButton.onClick.AddListener(() =>
         {
             if (Configuration.AppConfig.EnableSound)
                 AudioMenuClick[1].Play();
             mainController.GoMenu();
         });
+        #endregion
     }
-
 
     private void OnEnable()
     {
@@ -88,6 +101,15 @@ public class ScoreTable : MonoBehaviour
             Pos++;
         }
 
+    }
+
+    void ShowLeaderboardUI(bool success)
+    {
+        if (success)
+        {
+            PlayGamesPlatform.Activate();
+            PlayGamesPlatform.Instance.ShowLeaderboardUI(GPGSIds.leaderboard_main);
+        }
     }
 
 }

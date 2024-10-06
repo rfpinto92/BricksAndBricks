@@ -308,8 +308,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 500, y: -100}
-  m_SizeDelta: {x: 1000, y: 200}
+  m_AnchoredPosition: {x: 540.6698, y: -100}
+  m_SizeDelta: {x: 1081.3113, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &9184884050297312787
 MonoBehaviour:
@@ -331,8 +331,8 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 300, y: 150}
-  m_Spacing: {x: 50, y: 0}
+  m_CellSize: {x: 200, y: 150}
+  m_Spacing: {x: 150, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &6352745308915792557
@@ -350,6 +350,7 @@ MonoBehaviour:
   Pos: {fileID: 9184884049299041541}
   Name: {fileID: 9184884049549059195}
   Score: {fileID: 9184884050728852443}
+  Container: {fileID: 0}
 --- !u!1 &9184884050728852437
 GameObject:
   m_ObjectHideFlags: 0

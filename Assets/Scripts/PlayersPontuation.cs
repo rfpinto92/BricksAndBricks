@@ -38,6 +38,7 @@ public class PlayersPontuation : ScriptableObject
     #region Pontuation
     private string PontuationsFileName = "Pontuations.json";
     public List<Player> playersList;
+
     public PlayerArray myPlayerArray;
     #endregion
 
@@ -96,15 +97,29 @@ public class PlayersPontuation : ScriptableObject
     /// Add Score to the List
     /// </summary>
     /// <param name="Pontuation"></param>
-    public void AddPontuation(int Pontuation)
+    public void AddPontuation(int Pontuation)   
     {
         NewPlayer = new Player();
 
         NewPlayer.Name = PlayerName;
         NewPlayer.pontuation = Pontuation;
 
-        playersList.Add(NewPlayer);
+        #region Check if already exist and if the pontuation its higher
+        Player playerToCompare = playersList.Find(x => x.Name == NewPlayer.Name);
 
+        if (playerToCompare != null)
+        {
+            if (playerToCompare.pontuation < NewPlayer.pontuation)
+            {
+                playersList.Find(x => x.Name == NewPlayer.Name).pontuation = NewPlayer.pontuation;
+            }
+        }
+        else
+        {
+            playersList.Add(NewPlayer);
+        }
+        #endregion
+        
         var a = playersList.OrderByDescending(x => x.pontuation).ToList();
         playersList = a;
     }

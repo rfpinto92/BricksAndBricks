@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game.unity
     guid: 78a510c781f19db4da14f78ebb30946a
+  - enabled: 1
+    path: Assets/Scenes/RetryInternetConnection.unity
+    guid: 3df61e7787c206340bfbc78363925ff7
   m_configObjects: {}
