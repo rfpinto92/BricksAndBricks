@@ -10,9 +10,13 @@ All music and sounds are free of copy rights, and some of the 3D objects are par
 
 [![vi5LQOj991U](https://img.youtube.com/vi/vi5LQOj991U/hqdefault.jpg)](https://www.youtube.com/watch?v=vi5LQOj991U)
 
+## For the correct build
+
+- Change plataform to Android
+- Import TPM Fonts and Accept Google Conditions
+- Change Resolution to 1080 x 2340 Pixels 
+
 
 # 🚀 About Me
 
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rfpinto/)
-
-
